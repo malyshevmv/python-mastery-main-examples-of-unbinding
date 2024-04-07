@@ -15,6 +15,6 @@ def read_portfolio(filename:str):
         rows = csv.reader(f)
         headers = next(rows)
         for name, shares, price in rows:
-            record = Stock(name, shares, price)
+            record = Stock(name, int(shares), float(price))
             records.append(record)
     return records
