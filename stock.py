@@ -19,6 +19,12 @@ def read_portfolio(filename:str):
             records.append(record)
     return records
 
+def print_portfolio(lst:list):
+     print(f'{"name".rjust(10)}{"shares".rjust(10)}{"price".rjust(10)}')
+     print('---------- ' * 3)
+     for s in lst:
+          print(f'{s.name.rjust(10)} {s.shares:10} {s.price:10.2f}')
+
 if __name__ == '__main__':
     p = read_portfolio('E:\\python\\python-mastery-main\\python-mastery-main\\Data\\portfolio.csv')
     for s in p:
