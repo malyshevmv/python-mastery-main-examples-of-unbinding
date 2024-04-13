@@ -2,20 +2,30 @@ import csv
 
 
 class Stock:
+    types = (str, int, float)
+
     def __init__(self, name, shares, price):
         self.name = name
         self.shares = shares
         self.price = price
     def cost(self):
         return self.shares * self.price
+    
+    def sell(self, nshares):
+        self.shares -= nshares
+    
+    @classmethod
+    def from_row(cls, row):
+        values = [func(val) for func, val in zip(cls.types, row)]
+        return cls(*values)
 
 def read_portfolio(filename:str):
     records = []
     with open(filename) as f:
         rows = csv.reader(f)
         headers = next(rows)  # noqa: F841
-        for name, shares, price in rows:
-            record = Stock(name, int(shares), float(price))
+        for row in rows:
+            record = Stock.from_row(row)
             records.append(record)
     return records
 
