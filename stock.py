@@ -2,12 +2,20 @@ import csv
 
 
 class Stock:
-    types = (str, int, float)
+    _types = (str, int, float)
 
     def __init__(self, name, shares, price):
         self.name = name
         self.shares = shares
         self.price = price
+    
+    def __repr__(self):
+         return f'{type(self).__name__}({self.name!r},{self.shares!r},{self.price!r})'
+
+    def __eq__(self, other):
+        return isinstance(other, Stock) and ((self.name, self.shares, self.price) == 
+                                             (other.name, other.shares, other.price))
+
     def cost(self):
         return self.shares * self.price
     
@@ -16,7 +24,7 @@ class Stock:
     
     @classmethod
     def from_row(cls, row):
-        values = [func(val) for func, val in zip(cls.types, row)]
+        values = [func(val) for func, val in zip(cls._types, row)]
         return cls(*values)
 
 def read_portfolio(filename:str):
