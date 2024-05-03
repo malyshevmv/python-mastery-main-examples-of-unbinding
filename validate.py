@@ -52,7 +52,14 @@ class PositiveFloat(Float, Positive):
 class NonEmptyString(String, NonEmpty):
     pass
 
+from email import errors
+from functools import wraps
 from inspect import signature
+from os import error, name
+from unittest import result
+from wsgiref.validate import validator
+
+from networkx import degree_pearson_correlation_coefficient
 
 class ValidatedFunction:
     def __init__(self, func):
@@ -73,6 +80,54 @@ class ValidatedFunction:
             self.retcheck.check(result)
 
         return result
+
+def validated(func):
+    sig = signature(func)
+    anntations = dict[func.__annotations__]
+    retchek = anntations.pop('return', None)
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        bound = sig.bind(*args, **kwargs)
+        errors = []
+        for name, validator in anntations.items():
+            try:
+                validator.check(bound.arguments[name])
+            except Exception as e:
+                errors.append(f'    {name}: {e}')
+        if errors:
+            raise TypeError('Bad Arguments\n' + '\n'.join(errors))
+        if retchek:
+            try:
+                retchek.check(result)
+            except Exception as e:
+                raise TypeError(f'Bad return: {e}') from None
+    return wrapper
+
+    def enforce(**annotations):
+        retchek = anntations.pop('return_', None)
+        def decorate(func):
+            sig = signature(func)
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                bound = sig.bind(*args, **kwargs)
+                errors =[]
+                for name, validator in anntations.items():
+                    try:
+                        validator.check(bound.arguments[name])
+                    except Exception as e:
+                        errors.append(f'{name}: {e}')
+                if error:
+                    raise TypeError('Bad Arguments\n' + '\n'.join(errors))
+                result  =func(*args, **kwargs)
+                if retcheck:
+                    try:
+                        retcheck.check(result)
+                    except Exception as e:
+                        raise TypeError(f'Bad return: {e}') from None
+                return result
+            return wrapper
+        return decorate 
 
 if __name__ == '__main__':
     class Stock:
